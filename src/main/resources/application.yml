@@ -22,3 +22,6 @@ mybatis:
 upload:
   path: /Users/org/pet-uploads
   url-prefix: http://localhost:8080/upload
+
+ai:
+  api-key: sk-2231130223824be082cef7dfdc227cf9
