@@ -39,6 +39,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/adoption/list",
                         "/api/lost/list",
                         "/api/upload/**",
+                        "/api/ai/recognize",
                         "/upload/**"                     // 静态资源
                 );
     }
