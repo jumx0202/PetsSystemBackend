@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ynu.pet.mapper.AdoptionPostMapper">
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*)
+        FROM PostAdoption
+    </select>
+    <select id="countByContactPhone" resultType="int">
+        SELECT COUNT(*)
+        FROM PostAdoption
+        WHERE contact_phone = #{contactPhone}
+    </select>
+    <update id="updatePublisherByContactPhone">
+        UPDATE PostAdoption
+        SET postadoption_publisher_id = #{publisherId}
+        WHERE contact_phone = #{contactPhone}
+    </update>
+
+    <resultMap id="AdoptionPostResultMap" type="ynu.pet.entity.AdoptionPost">
+        <id property="id" column="id"/>
+        <result property="gender" column="gender"/>
+        <result property="breed" column="breed"/>
+        <result property="city" column="city"/>
+        <result property="district" column="district"/>
+        <result property="contactName" column="contact_name"/>
+        <result property="contactPhone" column="contact_phone"/>
+        <result property="contactWechat" column="contact_wechat"/>
+        <result property="description" column="description"/>
+        <result property="createdAt" column="created_at_postadoption"/>
+        <result property="status" column="status" javaType="ynu.pet.entity.AdoptionPost$PostStatus"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"/>
+        <association property="publisher" javaType="ynu.pet.entity.User">
+            <id property="id" column="u_id"/>
+            <result property="username" column="u_name"/>
+            <result property="phone" column="u_phone"/>
+            <result property="avatar" column="u_avatar"/>
+        </association>
+    </resultMap>
+
+    <insert id="insert" parameterType="ynu.pet.entity.AdoptionPost" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO PostAdoption(
+            postadoption_publisher_id, gender, breed, city, district,
+            contact_name, contact_phone, contact_wechat, description, status, created_at_postadoption
+        )
+        VALUES(
+            #{publisher.id}, #{gender}, #{breed}, #{city}, #{district},
+            #{contactName}, #{contactPhone}, #{contactWechat}, #{description}, #{status.value}, NOW()
+        )
+    </insert>
+
+    <select id="selectById" parameterType="long" resultMap="AdoptionPostResultMap">
+        SELECT p.postadoption_id AS id, p.gender, p.breed, p.city, p.district,
+               p.contact_name, p.contact_phone, p.contact_wechat, p.description, p.status, p.created_at_postadoption,
+               u.user_id AS u_id, u.username AS u_name, u.phone AS u_phone, u.avatar AS u_avatar
+        FROM PostAdoption p
+        LEFT JOIN User u ON p.postadoption_publisher_id = u.user_id
+        WHERE p.postadoption_id = #{id}
+    </select>
+
+    <select id="selectByCondition" resultMap="AdoptionPostResultMap">
+        SELECT p.postadoption_id AS id, p.gender, p.breed, p.city, p.district,
+               p.contact_name, p.contact_phone, p.contact_wechat, p.description, p.status, p.created_at_postadoption,
+               u.user_id AS u_id, u.username AS u_name, u.phone AS u_phone, u.avatar AS u_avatar
+        FROM PostAdoption p
+        LEFT JOIN User u ON p.postadoption_publisher_id = u.user_id
+        WHERE 1=1
+        <if test="status != null"> AND p.status = #{status} </if>
+        <if test="city != null and city != ''"> AND p.city = #{city} </if>
+        <if test="gender != null and gender != ''"> AND p.gender = #{gender} </if>
+        <if test="breed != null and breed != ''"> AND p.breed LIKE CONCAT('%', #{breed}, '%') </if>
+        ORDER BY p.created_at_postadoption DESC
+    </select>
+
+    <select id="selectByUserId" parameterType="long" resultMap="AdoptionPostResultMap">
+        SELECT p.postadoption_id AS id, p.gender, p.breed, p.city, p.district,
+               p.contact_name, p.contact_phone, p.contact_wechat, p.description, p.status, p.created_at_postadoption,
+               u.user_id AS u_id, u.username AS u_name, u.phone AS u_phone, u.avatar AS u_avatar
+        FROM PostAdoption p
+        LEFT JOIN User u ON p.postadoption_publisher_id = u.user_id
+        WHERE p.postadoption_publisher_id = #{userId}
+        ORDER BY p.created_at_postadoption DESC
+    </select>
+
+    <update id="update" parameterType="ynu.pet.entity.AdoptionPost">
+        UPDATE PostAdoption
+        SET gender = #{gender},
+            breed = #{breed},
+            city = #{city},
+            district = #{district},
+            contact_name = #{contactName},
+            contact_phone = #{contactPhone},
+            contact_wechat = #{contactWechat},
+            description = #{description},
+            status = #{status.value}
+        WHERE postadoption_id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE PostAdoption
+        SET status = #{status}
+        WHERE postadoption_id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM PostAdoption
+        WHERE postadoption_id = #{id}
+    </delete>
+
+    <update id="incrementViewCount" parameterType="long">
+        UPDATE PostAdoption
+        SET view_count = view_count + 1
+        WHERE postadoption_id = #{id}
+    </update>
+
+</mapper>

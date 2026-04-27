@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ynu.pet.mapper.BehaviorLogMapper">
+
+    <resultMap id="BehaviorLogResultMap" type="ynu.pet.entity.BehaviorLog">
+        <id property="id" column="id"/>
+        <result property="recordTime" column="record_time"/>
+        <result property="behaviorType" column="behavior_type"/>
+        <result property="emotionType" column="emotion_type"/>
+        <result property="confidence" column="confidence"/>
+        <result property="healthScore" column="health_score"/>
+        <result property="abnormalAlert" column="abnormal_alert"/>
+        <association property="pet" javaType="ynu.pet.entity.Pet">
+            <id property="id" column="pet_id"/>
+        </association>
+        <association property="model" javaType="ynu.pet.entity.BehaviorModel">
+            <id property="id" column="model_id"/>
+        </association>
+    </resultMap>
+
+    <insert id="insert" parameterType="ynu.pet.entity.BehaviorLog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO behavior_logs(pet_id, model_id, record_time, behavior_type, emotion_type, confidence, health_score, abnormal_alert)
+        VALUES(#{pet.id}, #{model.id}, #{recordTime}, #{behaviorType}, #{emotionType}, #{confidence}, #{healthScore}, #{abnormalAlert})
+    </insert>
+
+    <select id="selectById" parameterType="long" resultMap="BehaviorLogResultMap">
+        SELECT *
+        FROM behavior_logs
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByPetId" parameterType="long" resultMap="BehaviorLogResultMap">
+        SELECT *
+        FROM behavior_logs
+        WHERE pet_id = #{petId}
+        ORDER BY record_time DESC
+    </select>
+
+    <select id="selectAbnormalByPetId" parameterType="long" resultMap="BehaviorLogResultMap">
+        SELECT *
+        FROM behavior_logs
+        WHERE pet_id = #{petId}
+          AND abnormal_alert = 1
+        ORDER BY record_time DESC
+    </select>
+
+    <select id="selectByTimeRange" resultMap="BehaviorLogResultMap">
+        SELECT *
+        FROM behavior_logs
+        WHERE pet_id = #{petId}
+          AND record_time BETWEEN #{startTime} AND #{endTime}
+        ORDER BY record_time DESC
+    </select>
+
+    <select id="selectLatestByPetId" parameterType="long" resultMap="BehaviorLogResultMap">
+        SELECT *
+        FROM behavior_logs
+        WHERE pet_id = #{petId}
+        ORDER BY record_time DESC
+        LIMIT 1
+    </select>
+
+    <select id="countAbnormal" resultType="int">
+        SELECT COUNT(*)
+        FROM behavior_logs
+        WHERE pet_id = #{petId}
+          AND abnormal_alert = 1
+          AND record_time &gt;= #{startTime}
+    </select>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM behavior_logs
+        WHERE id = #{id}
+    </delete>
+
+</mapper>

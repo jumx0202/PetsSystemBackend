@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ynu.pet.mapper.PetMapper">
+
+    <resultMap id="PetResultMap" type="ynu.pet.entity.Pet">
+        <id property="id" column="id"/>
+        <result property="petName" column="pet_name"/>
+        <result property="petType" column="pet_type"/>
+        <result property="breed" column="breed"/>
+        <result property="gender" column="gender"/>
+        <result property="birthDate" column="birth_date"/>
+        <result property="weight" column="weight"/>
+        <result property="color" column="color"/>
+        <result property="distinctiveFeatures" column="distinctive_features"/>
+        <result property="chipNumber" column="chip_number"/>
+        <result property="avatar" column="avatar"/>
+        <association property="owner" javaType="ynu.pet.entity.User">
+            <id property="id" column="owner_id"/>
+            <result property="username" column="owner_name"/>
+        </association>
+    </resultMap>
+
+    <insert id="insert" parameterType="ynu.pet.entity.Pet" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO Pet(owner_id, pet_name, pet_type, breed, gender, birth_date, weight, color, distinctive_features, chip_number, avatar)
+        VALUES(#{owner.id}, #{petName}, #{petType}, #{breed}, #{gender}, #{birthDate}, #{weight}, #{color}, #{distinctiveFeatures}, #{chipNumber}, #{avatar})
+    </insert>
+
+    <select id="selectById" parameterType="long" resultMap="PetResultMap">
+        SELECT p.*, u.username AS owner_name
+        FROM Pet p
+        LEFT JOIN User u ON p.owner_id = u.user_id
+        WHERE p.id = #{id}
+    </select>
+
+    <select id="selectByOwnerId" parameterType="long" resultMap="PetResultMap">
+        SELECT p.*, u.username AS owner_name
+        FROM Pet p
+        LEFT JOIN User u ON p.owner_id = u.user_id
+        WHERE p.owner_id = #{ownerId}
+    </select>
+
+    <select id="selectByChipNumber" parameterType="string" resultMap="PetResultMap">
+        SELECT p.*, u.username AS owner_name
+        FROM Pet p
+        LEFT JOIN User u ON p.owner_id = u.user_id
+        WHERE p.chip_number = #{chipNumber}
+    </select>
+
+    <select id="selectAll" resultMap="PetResultMap">
+        SELECT p.*, u.username AS owner_name
+        FROM Pet p
+        LEFT JOIN User u ON p.owner_id = u.user_id
+        ORDER BY p.id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <update id="update" parameterType="ynu.pet.entity.Pet">
+        UPDATE Pet
+        SET pet_name = #{petName},
+            pet_type = #{petType},
+            breed = #{breed},
+            gender = #{gender},
+            birth_date = #{birthDate},
+            weight = #{weight},
+            color = #{color},
+            distinctive_features = #{distinctiveFeatures},
+            chip_number = #{chipNumber},
+            avatar = #{avatar}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM Pet
+        WHERE id = #{id}
+    </delete>
+
+</mapper>

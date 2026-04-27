@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ynu.pet.mapper.UserMapper">
+    <select id="selectFirstUserId" resultType="long">
+        SELECT user_id
+        FROM User
+        ORDER BY user_id ASC
+            LIMIT 1
+    </select>
+
+    <resultMap id="UserResultMap" type="ynu.pet.entity.User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="phone" column="phone"/>
+        <result property="password" column="password"/>
+        <result property="avatar" column="avatar"/>
+    </resultMap>
+
+    <select id="findByPhone" parameterType="string" resultMap="UserResultMap">
+        SELECT user_id AS id, username, phone, password, avatar
+        FROM User
+        WHERE phone = #{phone}
+    </select>
+
+    <select id="selectById" parameterType="long" resultMap="UserResultMap">
+        SELECT user_id AS id, username, phone, password, avatar
+        FROM User
+        WHERE user_id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="ynu.pet.entity.User" useGeneratedKeys="true" keyProperty="id" keyColumn="user_id">
+        INSERT INTO User(phone, password, username, avatar, created_at)
+        VALUES(#{phone}, #{password}, #{username}, #{avatar}, NOW())
+    </insert>
+
+    <update id="update" parameterType="ynu.pet.entity.User">
+        UPDATE User
+        SET username = #{username},
+            avatar = #{avatar},
+            phone = #{phone}
+        WHERE user_id = #{id}
+    </update>
+
+</mapper>
