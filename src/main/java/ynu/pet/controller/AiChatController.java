@@ -28,4 +28,10 @@ public class AiChatController {
     public Result<Map<String, String>> chat(@RequestBody AiChatRequestDTO request) {
         return aiChatService.chat(request);
     }
+
+    @Operation(summary = "AI 流式对话", description = "返回 SSE 流")
+    @PostMapping(value = "/stream-chat", produces = org.springframework.http.MediaType.TEXT_EVENT_STREAM_VALUE)
+    public org.springframework.web.servlet.mvc.method.annotation.SseEmitter streamChat(@RequestBody AiChatRequestDTO request) {
+        return aiChatService.streamChat(request);
+    }
 }
