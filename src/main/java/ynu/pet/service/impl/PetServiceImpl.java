@@ -5,6 +5,7 @@ import ynu.pet.dto.Result;
 import ynu.pet.entity.Image;
 import ynu.pet.entity.Pet;
 import ynu.pet.entity.User;
+import ynu.pet.exception.BussinessException;
 import ynu.pet.mapper.ImageMapper;
 import ynu.pet.mapper.PetMapper;
 import org.springframework.beans.BeanUtils;
@@ -30,6 +31,7 @@ public class PetServiceImpl implements PetService {
     public Result<Void> createPet(PetDTO dto, Long ownerId) {
         Pet pet = new Pet();
         BeanUtils.copyProperties(dto, pet);
+        pet.setPetType(convertPetType(dto.getPetType()));
 
         User owner = new User();
         owner.setId(ownerId);
@@ -90,6 +92,7 @@ public class PetServiceImpl implements PetService {
     public Result<Void> updatePet(PetDTO dto) {
         Pet pet = new Pet();
         BeanUtils.copyProperties(dto, pet);
+        pet.setPetType(convertPetType(dto.getPetType()));
         petMapper.update(pet);
         return Result.success();
     }
@@ -106,12 +109,25 @@ public class PetServiceImpl implements PetService {
         return Result.success();
     }
 
+    private Pet.PetType convertPetType(Integer petType) {
+        if (petType == null) {
+            return null;
+        }
+
+        Pet.PetType[] values = Pet.PetType.values();
+        if (petType < 0 || petType >= values.length) {
+            throw new BussinessException(400, "不支持的宠物类型：" + petType);
+        }
+        return values[petType];
+    }
+
     private PetDTO convertToDTO(Pet pet) {
         PetDTO dto = new PetDTO();
         BeanUtils.copyProperties(pet, dto);
 
         // 设置宠物类型描述
         if (pet.getPetType() != null) {
+            dto.setPetType(pet.getPetType().ordinal());
             dto.setPetTypeDesc(pet.getPetType().getDescription());
         }
 

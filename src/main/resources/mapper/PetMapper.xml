@@ -7,7 +7,8 @@
     <resultMap id="PetResultMap" type="ynu.pet.entity.Pet">
         <id property="id" column="id"/>
         <result property="petName" column="pet_name"/>
-        <result property="petType" column="pet_type"/>
+        <result property="petType" column="pet_type"
+                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"/>
         <result property="breed" column="breed"/>
         <result property="gender" column="gender"/>
         <result property="birthDate" column="birth_date"/>
@@ -24,7 +25,7 @@
 
     <insert id="insert" parameterType="ynu.pet.entity.Pet" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO Pet(owner_id, pet_name, pet_type, breed, gender, birth_date, weight, color, distinctive_features, chip_number, avatar)
-        VALUES(#{owner.id}, #{petName}, #{petType}, #{breed}, #{gender}, #{birthDate}, #{weight}, #{color}, #{distinctiveFeatures}, #{chipNumber}, #{avatar})
+        VALUES(#{owner.id}, #{petName}, #{petType, typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}, #{breed}, #{gender}, #{birthDate}, #{weight}, #{color}, #{distinctiveFeatures}, #{chipNumber}, #{avatar})
     </insert>
 
     <select id="selectById" parameterType="long" resultMap="PetResultMap">
@@ -59,7 +60,7 @@
     <update id="update" parameterType="ynu.pet.entity.Pet">
         UPDATE Pet
         SET pet_name = #{petName},
-            pet_type = #{petType},
+            pet_type = #{petType, typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler},
             breed = #{breed},
             gender = #{gender},
             birth_date = #{birthDate},

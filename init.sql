@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS Pet (
     id                   INT          PRIMARY KEY AUTO_INCREMENT COMMENT '宠物ID',
     owner_id             INT          NOT NULL               COMMENT '主人ID',
     pet_name             VARCHAR(50)  NOT NULL               COMMENT '宠物名字',
-    pet_type             TINYINT      NOT NULL               COMMENT '类型：1-狗 2-猫 3-其他',
+    pet_type             TINYINT      NOT NULL               COMMENT '类型：0-狗 1-猫 2-其他',
     breed                VARCHAR(100)                        COMMENT '品种',
-    gender               TINYINT                             COMMENT '性别：0-不详 1-公 2-母',
+    gender               VARCHAR(10)                         COMMENT '性别：公/母/不详',
     birth_date           DATE                                COMMENT '出生日期',
     weight               DECIMAL(5,2)                        COMMENT '体重(kg)',
     color                VARCHAR(50)                         COMMENT '毛色',
@@ -157,7 +157,20 @@ CREATE TABLE IF NOT EXISTS Image (
     INDEX idx_pet          (pet_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='帖子图片表';
 
--- ── 8. 行为统计日报表 ─────────────────────────────────────────────────────
+-- ── 8. 宠物定位记录表 ─────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS pet_location (
+    id          INT           PRIMARY KEY AUTO_INCREMENT COMMENT '定位记录ID',
+    pet_id      INT           NOT NULL               COMMENT '宠物ID',
+    latitude    DECIMAL(10,7) NOT NULL               COMMENT '纬度',
+    longitude   DECIMAL(10,7) NOT NULL               COMMENT '经度',
+    speed       FLOAT         DEFAULT 0              COMMENT '速度(km/h)',
+    source      VARCHAR(20)   DEFAULT 'MOCK'         COMMENT '来源：MOCK/GPS/MANUAL',
+    recorded_at DATETIME      DEFAULT CURRENT_TIMESTAMP COMMENT '上报时间',
+    FOREIGN KEY (pet_id) REFERENCES Pet(id) ON DELETE CASCADE,
+    INDEX idx_pet_recorded_at (pet_id, recorded_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='宠物定位记录表';
+
+-- ── 9. 行为统计日报表 ─────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS behavior_daily_stats (
     id                   INT          PRIMARY KEY AUTO_INCREMENT,
     pet_id               INT          NOT NULL   COMMENT '宠物ID',
@@ -175,7 +188,7 @@ CREATE TABLE IF NOT EXISTS behavior_daily_stats (
     FOREIGN KEY (pet_id) REFERENCES Pet(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='行为统计日报表';
 
--- ── 9. 收藏/关注表 ───────────────────────────────────────────────────────
+-- ── 10. 收藏/关注表 ───────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS favorites (
     id          INT      PRIMARY KEY AUTO_INCREMENT,
     user_id     INT      NOT NULL COMMENT '用户ID',
@@ -186,7 +199,7 @@ CREATE TABLE IF NOT EXISTS favorites (
     FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='收藏关注表';
 
--- ── 10. 消息通知表 ────────────────────────────────────────────────────────
+-- ── 11. 消息通知表 ────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS notifications (
     id           INT          PRIMARY KEY AUTO_INCREMENT,
     user_id      INT          NOT NULL   COMMENT '接收用户ID',

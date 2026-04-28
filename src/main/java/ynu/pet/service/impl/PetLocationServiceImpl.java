@@ -11,6 +11,7 @@ import ynu.pet.mapper.PetLocationMapper;
 import ynu.pet.mapper.PetMapper;
 import ynu.pet.service.PetLocationService;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,9 @@ public class PetLocationServiceImpl implements PetLocationService {
     @Override
     public void saveAndBroadcast(Long petId, String petName, double latitude, double longitude, String source) {
         // 1. 构造并持久化位置记录
+        PetLocation previous = locationMapper.selectLatestByPetId(petId);
         PetLocation record = new PetLocation(petId, latitude, longitude, source);
+        record.setSpeed(calculateSpeed(previous, record));
         locationMapper.insert(record);
         log.debug("已保存位置记录: petId={}, lat={}, lng={}", petId, latitude, longitude);
 
@@ -52,6 +55,35 @@ public class PetLocationServiceImpl implements PetLocationService {
         String destination = "/topic/pet/" + petId + "/location";
         messagingTemplate.convertAndSend(destination, dto);
         log.debug("已广播位置: destination={}", destination);
+    }
+
+    private Float calculateSpeed(PetLocation previous, PetLocation current) {
+        if (previous == null || previous.getRecordedAt() == null || current.getRecordedAt() == null) {
+            return 0f;
+        }
+
+        long seconds = Duration.between(previous.getRecordedAt(), current.getRecordedAt()).getSeconds();
+        if (seconds <= 0) {
+            return 0f;
+        }
+
+        double distanceKm = haversineKm(
+                previous.getLatitude(), previous.getLongitude(),
+                current.getLatitude(), current.getLongitude()
+        );
+        double speed = distanceKm / (seconds / 3600.0);
+        return (float) Math.min(speed, 30.0);
+    }
+
+    private double haversineKm(double lat1, double lng1, double lat2, double lng2) {
+        final double earthRadiusKm = 6371.0;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLng = Math.toRadians(lng2 - lng1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return earthRadiusKm * c;
     }
 
     @Override

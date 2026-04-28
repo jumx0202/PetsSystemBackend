@@ -63,6 +63,8 @@ mvn spring-boot:run
 
 数据库名：`petSql`，初始化脚本：`init.sql`
 
+如果是首次启动 Docker 数据库，`init.sql` 会自动创建正确表结构。若本地已经用旧脚本创建过数据库，请执行一次 `fix_pet_table.sql`，用于修正 `Pet` 表中的 `pet_type`、`gender`、`avatar` 字段。
+
 主要数据表：
 
 | 表名 | 说明 |

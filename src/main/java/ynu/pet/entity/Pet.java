@@ -26,7 +26,7 @@ public class Pet {
 
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "pet_type", nullable = false)
-    private PetType petType;  // DOG=1, CAT=2, OTHER=3
+    private PetType petType;  // DOG=0, CAT=1, OTHER=2
 
     @Column(length = 100)
     private String breed;
@@ -48,6 +48,9 @@ public class Pet {
     @Column(name = "chip_number", unique = true, length = 50)
     private String chipNumber;
 
+    @Column(length = 500)
+    private String avatar;
+
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Image> images;
 
@@ -68,9 +71,9 @@ public class Pet {
     // ========== 宠物类型枚举 ==========
     @Getter
     public enum PetType {
-        DOG(1, "狗"),
-        CAT(2, "猫"),
-        OTHER(3, "其他");
+        DOG(0, "狗"),
+        CAT(1, "猫"),
+        OTHER(2, "其他");
 
         private final int value;
         private final String description;

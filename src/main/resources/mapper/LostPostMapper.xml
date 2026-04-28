@@ -14,6 +14,13 @@
         WHERE contact_phone = #{contactPhone}
     </update>
 
+    <resultMap id="PublisherResultMap" type="ynu.pet.entity.User">
+        <id property="id" column="u_id"/>
+        <result property="username" column="u_name"/>
+        <result property="phone" column="u_phone"/>
+        <result property="avatar" column="u_avatar"/>
+    </resultMap>
+
     <resultMap id="LostPostResultMap" type="ynu.pet.entity.LostPost">
         <id property="id" column="id"/>
         <result property="petName" column="pet_name"/>
@@ -27,14 +34,9 @@
         <result property="contactWechat" column="contact_wechat"/>
         <result property="description" column="description"/>
         <result property="createdAt" column="created_at"/>
-        <result property="status" column="status" javaType="ynu.pet.entity.LostPost$LostStatus"
-                typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"/>
-        <association property="publisher" javaType="ynu.pet.entity.User">
-            <id property="id" column="u_id"/>
-            <result property="username" column="u_name"/>
-            <result property="phone" column="u_phone"/>
-            <result property="avatar" column="u_avatar"/>
-        </association>
+        <result property="status" column="status"
+                typeHandler="ynu.pet.handler.LostPostStatusTypeHandler"/>
+        <association property="publisher" resultMap="PublisherResultMap"/>
     </resultMap>
 
     <insert id="insert" parameterType="ynu.pet.entity.LostPost" useGeneratedKeys="true" keyProperty="id">
