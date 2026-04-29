@@ -14,22 +14,23 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * 宠物 GPS 位置 Mock 定时任务
+ * 宠物 GPS 位置 Mock 定时任务（所有宠物在北京活动）
  *
- * <p>在真实产品中，此处应为 GPS 硬件设备定期调用 /api/location/report 接口。
- * 在演示/毕设场景下，我们使用定时任务模拟设备周期性上报行为：
- * 每 5 秒为系统中所有宠物生成一个带随机偏移的坐标，模拟宠物在昆明市中心附近活动。</p>
+ * <p>所有宠物的模拟位置都固定在北京（天安门附近）的小范围内连续游走。</p>
  */
 @Slf4j
 @Component
 public class LocationMockTask {
 
-    // 基准坐标：云南大学（昆明市中心附近），WGS-84 坐标系
-    private static final double BASE_LAT = 25.0692;
-    private static final double BASE_LNG = 102.6975;
+    // 北京基准坐标（天安门广场）
+    private static final double BASE_LAT = 39.9042;
+    private static final double BASE_LNG = 116.4074;
 
-    // 最大随机游走范围（约 ±150m）
+    // 每个宠物周围游走的最大半径（约 ±150m）
     private static final double MAX_OFFSET = 0.0015;
+
+    // 步进步长（约 ±30m）
+    private static final double STEP = 0.0003;
 
     private final Random random = new Random();
 
@@ -40,53 +41,53 @@ public class LocationMockTask {
     private PetMapper petMapper;
 
     /**
-     * 存储每只宠物当前的"漫游位置"，实现连续游走（而不是每次都从基准点跳变）
+     * 存储每只宠物当前的游走位置
      * key: petId, value: [lat, lng]
      */
     private final Map<Long, double[]> currentPositions = new HashMap<>();
 
     /**
      * 每 5 秒执行一次 Mock 位置上报
-     * fixedDelay 确保两次任务之间的间隔，而非固定频率
      */
     @Scheduled(fixedDelay = 5000)
     public void generateMockLocations() {
         try {
-            // 获取系统中所有宠物ID
-            List<Long> petIds = petMapper.selectAll(0, Integer.MAX_VALUE)
-                    .stream()
-                    .map(Pet::getId)
-                    .toList();
-
-            if (petIds.isEmpty()) {
+            List<Pet> pets = petMapper.selectAll(0, Integer.MAX_VALUE);
+            if (pets.isEmpty()) {
                 return;
             }
 
-            for (Long petId : petIds) {
-                // 获取该宠物当前位置（首次使用基准点 + 小随机偏移）
-                double[] pos = currentPositions.computeIfAbsent(petId, id -> new double[]{
-                        BASE_LAT + (random.nextDouble() - 0.5) * MAX_OFFSET * 2,
-                        BASE_LNG + (random.nextDouble() - 0.5) * MAX_OFFSET * 2
-                });
+            for (Pet pet : pets) {
+                Long petId = pet.getId();
 
-                // 在当前位置基础上做小步随机游走（±30m）
-                double step = 0.0003;
-                pos[0] += (random.nextDouble() - 0.5) * step;
-                pos[1] += (random.nextDouble() - 0.5) * step;
+                // 获取当前游走位置（首次使用基准点 + 小随机偏移）
+                double[] pos = currentPositions.get(petId);
+                if (pos == null) {
+                    double[] newPos = new double[]{
+                            BASE_LAT + (random.nextDouble() - 0.5) * MAX_OFFSET * 2,
+                            BASE_LNG + (random.nextDouble() - 0.5) * MAX_OFFSET * 2
+                    };
+                    currentPositions.put(petId, newPos);
+                    pos = newPos;
+                }
 
-                // 超出边界时反弹，确保宠物不会跑太远
-                if (Math.abs(pos[0] - BASE_LAT) > MAX_OFFSET) pos[0] = BASE_LAT + (random.nextDouble() - 0.5) * MAX_OFFSET;
-                if (Math.abs(pos[1] - BASE_LNG) > MAX_OFFSET) pos[1] = BASE_LNG + (random.nextDouble() - 0.5) * MAX_OFFSET;
+                // 在当前位置基础上做小步随机游走
+                pos[0] += (random.nextDouble() - 0.5) * STEP;
+                pos[1] += (random.nextDouble() - 0.5) * STEP;
 
-                // 获取宠物名称（从 Pet 对象）
-                Pet pet = petMapper.selectById(petId);
-                String petName = pet != null ? pet.getPetName() : "宠物" + petId;
+                // 边界反弹：确保宠物不会跑出北京圈定范围
+                if (Math.abs(pos[0] - BASE_LAT) > MAX_OFFSET) {
+                    pos[0] = BASE_LAT + (random.nextDouble() - 0.5) * MAX_OFFSET;
+                }
+                if (Math.abs(pos[1] - BASE_LNG) > MAX_OFFSET) {
+                    pos[1] = BASE_LNG + (random.nextDouble() - 0.5) * MAX_OFFSET;
+                }
 
                 // 保存并通过 WebSocket 广播
-                locationService.saveAndBroadcast(petId, petName, pos[0], pos[1], "MOCK");
+                locationService.saveAndBroadcast(petId, pet.getPetName(), pos[0], pos[1], "MOCK");
             }
 
-            log.debug("[Mock] 已为 {} 只宠物更新位置", petIds.size());
+            log.debug("[Mock] 已为 {} 只宠物更新北京内的位置", pets.size());
 
         } catch (Exception e) {
             log.warn("[Mock] 位置生成失败: {}", e.getMessage());
