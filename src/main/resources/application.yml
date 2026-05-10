@@ -20,7 +20,7 @@ mybatis:
     map-underscore-to-camel-case: true
 
 upload:
-  path: /Users/org/pet-uploads
+  path: D:/PetsSystemBackend/uploads
   url-prefix: http://localhost:8080/upload
 
 ai:

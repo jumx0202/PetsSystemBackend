@@ -71,7 +71,7 @@ public class AdoptionPostServiceImpl implements AdoptionPostService {
     public Result<PageResult<AdoptionPostDTO>> listPosts(String city, String gender,
                                                          String breed, Integer pageNum, Integer pageSize) {
         List<AdoptionPost> posts = postMapper.selectByCondition(
-                city, gender, breed, AdoptionPost.PostStatus.SEARCHING.getValue());
+                city, gender, breed, null);
         List<AdoptionPostDTO> dtoList = new ArrayList<>();
 
         for (AdoptionPost post : posts) {
@@ -120,6 +120,13 @@ public class AdoptionPostServiceImpl implements AdoptionPostService {
     @Override
     @Transactional
     public Result<Void> adoptPost(Long id, Long adopterId) {
+        AdoptionPost post = postMapper.selectById(id);
+        if (post == null) {
+            return Result.error("帖子不存在");
+        }
+        if (post.getPublisher() == null || !post.getPublisher().getId().equals(adopterId)) {
+            return Result.error("无权限操作");
+        }
         postMapper.updateStatus(id, AdoptionPost.PostStatus.FOUND.getValue());
         return Result.success();
     }
@@ -148,6 +155,7 @@ public class AdoptionPostServiceImpl implements AdoptionPostService {
     private AdoptionPostDTO convertToDTO(AdoptionPost post) {
         AdoptionPostDTO dto = new AdoptionPostDTO();
         BeanUtils.copyProperties(post, dto);
+        dto.setStatus(post.getStatus() == null ? null : post.getStatus().name());
 
         // 设置发布者信息
         if (post.getPublisher() != null) {

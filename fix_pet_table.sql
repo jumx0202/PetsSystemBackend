@@ -16,3 +16,25 @@ CREATE TABLE IF NOT EXISTS pet_location (
     FOREIGN KEY (pet_id) REFERENCES Pet(id) ON DELETE CASCADE,
     INDEX idx_pet_recorded_at (pet_id, recorded_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='宠物定位记录表';
+
+SELECT * FROM Pet;
+DESC Pet;
+
+ALTER TABLE Pet DROP chip_number;
+ALTER TABLE PostAdoption DROP view_count;
+ALTER TABLE PostAdoption DROP adopter_id ;
+ALTER TABLE PostAdoption DROP FOREIGN KEY PostAdoption_ibfk_2;
+ALTER TABLE PostLost DROP FOREIGN KEY PostLost_ibfk_2;
+DESC PostAdoption;
+ALTER TABLE PostLost DROP lostpet_id;
+ALTER TABLE PostLost DROP view_count;
+DESC PostLost;
+DESC Image;
+
+DROP TABLE behavior_models CASCADE;   -- 同时删除依赖的外键约束（谨慎使用）
+DROP TABLE behavior_logs CASCADE;   -- 同时删除依赖的外键约束（谨慎使用）
+
+ALTER TABLE Image DROP behavior_log_id;
+
+DROP TABLE behavior_daily_stats;
+DROP TABLE notifications;

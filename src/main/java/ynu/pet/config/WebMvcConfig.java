@@ -20,9 +20,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-//        registry.addMapping("/**")
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:5173", "http://localhost:8080") // Vue前端地址(5173)+后端自身(8080)
+                .allowedOrigins("http://localhost:5173", "http://localhost:8080")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)
@@ -40,14 +39,20 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/lost/list",
                         "/api/upload/**",
                         "/api/ai/recognize",
-                        "/upload/**"                     // 静态资源
+                        "/upload/**",
+                        "/images/**"          // 让图片资源不经过 JWT 拦截
                 );
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 上传文件映射为静态资源
+        // 原有上传映射
         registry.addResourceHandler("/upload/**")
                 .addResourceLocations("file:" + uploadPath + "/");
+
+        // 头像映射（多位置查找）
+//        registry.addResourceHandler("/images/**")
+//                .addResourceLocations("file:" + uploadPath + "/images/", "classpath:/static/images/")
+//                .setCachePeriod(3600);
     }
 }

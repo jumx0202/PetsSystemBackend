@@ -71,6 +71,34 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result<Void> updateUser(User user) {
+        if (user.getId() == null) {
+            return Result.error("用户不存在");
+        }
+
+        User existingUser = userMapper.selectById(user.getId());
+        if (existingUser == null) {
+            return Result.error("用户不存在");
+        }
+
+        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+            return Result.error("用户名不能为空");
+        }
+
+        if (user.getPhone() == null || !user.getPhone().matches("^1[3-9]\\d{9}$")) {
+            return Result.error("请输入正确的11位手机号");
+        }
+
+        User phoneOwner = userMapper.findByPhone(user.getPhone());
+        if (phoneOwner != null && !phoneOwner.getId().equals(user.getId())) {
+            return Result.error("该手机号已被其他账号使用");
+        }
+
+        if (user.getAvatar() == null || user.getAvatar().trim().isEmpty()) {
+            user.setAvatar(existingUser.getAvatar());
+        }
+
+        user.setPassword(existingUser.getPassword());
+
         userMapper.update(user);
         return Result.success();
     }
@@ -82,9 +110,21 @@ public class UserServiceImpl implements UserService {
             return Result.error("用户不存在");
         }
 
+        if (oldPassword == null || oldPassword.trim().isEmpty()) {
+            return Result.error("请输入原密码");
+        }
+
         // 【明文密码验证】
         if (!oldPassword.equals(user.getPassword())) {
             return Result.error("原密码错误");
+        }
+
+        if (newPassword == null || newPassword.length() < 6) {
+            return Result.error("新密码至少6位");
+        }
+
+        if (oldPassword.equals(newPassword)) {
+            return Result.error("新密码不能和原密码相同");
         }
 
         // 【新密码明文存储】

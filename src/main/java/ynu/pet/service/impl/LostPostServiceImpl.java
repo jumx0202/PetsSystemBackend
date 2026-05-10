@@ -75,7 +75,7 @@ public class LostPostServiceImpl implements LostPostService {
     public Result<PageResult<LostPostDTO>> listPosts(String city, String gender,
                                                      String breed, Integer pageNum, Integer pageSize) {
         List<LostPost> posts = postMapper.selectByCondition(
-                city, gender, breed, LostPost.LostStatus.SEARCHING.getValue());
+                city, gender, breed, null);
         List<LostPostDTO> dtoList = new ArrayList<>();
 
         for (LostPost post : posts) {
@@ -134,6 +134,7 @@ public class LostPostServiceImpl implements LostPostService {
     private LostPostDTO convertToDTO(LostPost post) {
         LostPostDTO dto = new LostPostDTO();
         BeanUtils.copyProperties(post, dto);
+        dto.setStatus(post.getStatus() == null ? null : post.getStatus().name());
 
         if (post.getPublisher() != null) {
             UserDTO userDTO = new UserDTO();

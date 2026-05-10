@@ -29,7 +29,10 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
         // 帖子详情允许游客访问
         if (HttpMethod.GET.matches(request.getMethod())
-                && (uri.matches("^/api/adoption/\\d+$") || uri.matches("^/api/lost/\\d+$"))) {
+                && (uri.matches("^/api/adoption/\\d+$")
+                || uri.matches("^/api/lost/\\d+$")
+                || uri.equals("/api/forum/posts")
+                || uri.matches("^/api/forum/posts/\\d+$"))) {
             return true;
         }
 

@@ -39,7 +39,8 @@
         UPDATE User
         SET username = #{username},
             avatar = #{avatar},
-            phone = #{phone}
+            phone = #{phone},
+            password = #{password}
         WHERE user_id = #{id}
     </update>
 

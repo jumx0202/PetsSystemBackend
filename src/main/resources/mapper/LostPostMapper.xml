@@ -41,7 +41,7 @@
 
     <insert id="insert" parameterType="ynu.pet.entity.LostPost" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO PostLost(
-            postlost_publisher_id, lostpet_id, lostpet_name, gender, breed,
+            postlost_publisher_id, postlost_id, lostpet_name, gender, breed,
             lost_time, lostcity, lost_location, contact_name, contact_phone,
             contact_wechat, description, status, created_at
         )
