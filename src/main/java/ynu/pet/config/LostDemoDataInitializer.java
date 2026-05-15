@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ynu.pet.dto.LostPostDTO;
 import ynu.pet.entity.User;
+import ynu.pet.mapper.ImageMapper;
 import ynu.pet.mapper.LostPostMapper;
 import ynu.pet.mapper.UserMapper;
 import ynu.pet.service.LostPostService;
@@ -21,34 +22,53 @@ public class LostDemoDataInitializer {
     private LostPostService lostPostService;
 
     @Autowired
+    private ImageMapper imageMapper;
+
+    @Autowired
     private UserMapper userMapper;
+
+    private static final List<String> REMOVED_DEMO_CONTACT_PHONES = List.of(
+            "136-0000-0004",
+            "135-0000-0005",
+            "134-0000-0006",
+            "133-0000-0007"
+    );
 
     @PostConstruct
     public void init() {
+        cleanupRemovedDemoPosts();
         seedPost(
                 ensurePublisher("13820000001", "Sarah Johnson", "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah"),
-                "Buddy", "公", "Golden Retriever",
+                "Buddy", "Male", "Golden Retriever",
                 "2026-04-10 15:00", "New York", "Central Park, near the fountain area",
                 "Sarah Johnson", "138-0000-0001", "sarah_pet2024",
-                "Golden retriever with a red collar, very friendly and responds to the name \"Buddy\". Has a small white patch on the left ear. Very playful and loves to fetch balls. Last seen wearing a blue harness.",
-                "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop"
+                "Golden retriever with a red collar, very friendly and responds to the name Buddy. Has a small white patch on the left ear.",
+                "/hamster-pet.svg"
         );
         seedPost(
                 ensurePublisher("13820000002", "Emily Chen", "https://api.dicebear.com/7.x/avataaars/svg?seed=emily"),
-                "Milo", "公", "Tabby Cat",
+                "Milo", "Male", "Tabby Cat",
                 "2026-04-12 08:30", "Brooklyn", "Heights, Community Garden",
                 "Emily Chen", "139-0000-0002", null,
-                "Orange tabby cat, very shy, has a bell on the collar. Answers to \"Milo\". Last seen near the community garden. He is afraid of loud noises and may hide in small spaces. Please approach slowly.",
-                "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&h=400&fit=crop"
+                "Orange tabby cat, very shy, has a bell on the collar. Answers to Milo and may hide in small spaces.",
+                "/bird-pet.svg"
         );
         seedPost(
                 ensurePublisher("13820000003", "Michael Brown", "https://api.dicebear.com/7.x/avataaars/svg?seed=michael"),
-                "Snowy", "母", "Toy Poodle",
+                "Snowy", "Female", "Toy Poodle",
                 "2026-04-11 18:00", "New York", "Upper West Side, Riverside Park",
                 "Michael Brown", "137-0000-0003", "mike_brown88",
-                "Small white poodle, elderly with slight vision problems. Wearing a blue harness. Very gentle but may be frightened. She responds to \"Snowy\" and loves treats. Please check under cars and in shaded areas.",
-                "https://images.unsplash.com/photo-1583511655857-d19bc40da7e6?w=400&h=400&fit=crop"
+                "Small white poodle, elderly with slight vision problems. Wearing a blue harness and responds to Snowy.",
+                "/snake-pet.svg"
         );
+    }
+
+    private void cleanupRemovedDemoPosts() {
+        List<Long> postIds = lostPostMapper.selectIdsByContactPhones(REMOVED_DEMO_CONTACT_PHONES);
+        if (!postIds.isEmpty()) {
+            imageMapper.deleteByLostPostIds(postIds);
+            lostPostMapper.deleteByContactPhones(REMOVED_DEMO_CONTACT_PHONES);
+        }
     }
 
     private Long ensurePublisher(String phone, String username, String avatar) {

@@ -13,6 +13,8 @@ public interface AdoptionPostMapper {
     int countAll();
     int countByContactPhone(@Param("contactPhone") String contactPhone);
     int updatePublisherByContactPhone(@Param("contactPhone") String contactPhone, @Param("publisherId") Long publisherId);
+    List<Long> selectIdsByContactPhones(@Param("contactPhones") List<String> contactPhones);
+    int deleteByContactPhones(@Param("contactPhones") List<String> contactPhones);
 
     // 插入帖子
     int insert(AdoptionPost post);

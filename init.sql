@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS Pet (
     color                VARCHAR(50)                         COMMENT '毛色',
     distinctive_features VARCHAR(500)                        COMMENT '显著特征',
     -- 已删除
-#     chip_number          VARCHAR(50)  UNIQUE                 COMMENT '芯片编号',
+    chip_number          VARCHAR(50)  UNIQUE                 COMMENT '芯片编号',
     avatar               VARCHAR(500)                        COMMENT '宠物头像',
     health_status        VARCHAR(200)                        COMMENT '健康状况',
     is_neutered          TINYINT(1)   DEFAULT 0              COMMENT '是否绝育：0-否 1-是',
@@ -43,6 +43,8 @@ CREATE TABLE IF NOT EXISTS Pet (
     updated_at           DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (owner_id) REFERENCES User(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='宠物档案表';
+
+ALTER TABLE Pet ADD COLUMN chip_number VARCHAR(50);
 
 -- ── 3. 领养帖子表 ─────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS PostAdoption (

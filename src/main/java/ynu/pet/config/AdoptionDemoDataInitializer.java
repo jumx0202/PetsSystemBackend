@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import ynu.pet.dto.AdoptionPostDTO;
 import ynu.pet.entity.User;
 import ynu.pet.mapper.AdoptionPostMapper;
+import ynu.pet.mapper.ImageMapper;
 import ynu.pet.mapper.UserMapper;
 import ynu.pet.service.AdoptionPostService;
 
@@ -21,52 +22,71 @@ public class AdoptionDemoDataInitializer {
     private AdoptionPostService adoptionPostService;
 
     @Autowired
+    private ImageMapper imageMapper;
+
+    @Autowired
     private UserMapper userMapper;
+
+    private static final List<String> REMOVED_DEMO_CONTACT_PHONES = List.of(
+            "133-0000-0007",
+            "132-0000-0008",
+            "131-0000-0009",
+            "130-0000-0010"
+    );
 
     @PostConstruct
     public void init() {
+        cleanupRemovedDemoPosts();
         seedPost(
-                ensurePublisher("13810000001", "张先生", "https://api.dicebear.com/7.x/avataaars/svg?seed=zhang"),
-                "公", "Terrier & Labrador Retriever", "北京", "朝阳区",
-                "张先生", "138-0000-0001", "zhang_pet",
-                "活泼亲人，已打疫苗，性格温顺，适合有小孩家庭。这是一只非常可爱的狗狗，喜欢在草地上奔跑，对人非常友好，是家庭的理想选择。",
-                "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop"
+                ensurePublisher("13810000001", "Zhang", "https://api.dicebear.com/7.x/avataaars/svg?seed=zhang"),
+                "Male", "Terrier & Labrador Retriever", "Beijing", "Chaoyang District",
+                "Zhang", "138-0000-0001", "zhang_pet",
+                "Friendly and vaccinated, suitable for a family that can provide regular outdoor exercise and patient companionship.",
+                "/hamster-pet.svg"
         );
         seedPost(
-                ensurePublisher("13810000002", "李女士", "https://api.dicebear.com/7.x/avataaars/svg?seed=li"),
-                "母", "金毛寻回犬", "上海", "浦东新区",
-                "李女士", "139-0000-0002", null,
-                "一岁半，非常友好，已绝育，寻找爱心家庭。金毛犬性格温和，是家庭的理想伴侣，特别适合有小孩的家庭。",
-                "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&h=400&fit=crop"
+                ensurePublisher("13810000002", "Li", "https://api.dicebear.com/7.x/avataaars/svg?seed=li"),
+                "Female", "Golden Retriever", "Shanghai", "Pudong",
+                "Li", "139-0000-0002", null,
+                "One and a half years old, gentle and already neutered. Looking for a caring home with enough space and daily interaction.",
+                "/bird-pet.svg"
         );
         seedPost(
-                ensurePublisher("13810000003", "王先生", "https://api.dicebear.com/7.x/avataaars/svg?seed=wang"),
-                "公", "阿拉斯加", "广州", "天河区",
-                "王先生", "137-0000-0003", "wang_alaska",
-                "两岁，巨型雪橇犬，习惯良好，需要大空间。阿拉斯加犬精力充沛，需要经常运动，适合有院子的家庭。",
-                "https://images.unsplash.com/photo-1583511655857-d19bc40da7e6?w=400&h=400&fit=crop"
+                ensurePublisher("13810000003", "Wang", "https://api.dicebear.com/7.x/avataaars/svg?seed=wang"),
+                "Male", "Alaskan Malamute", "Guangzhou", "Tianhe District",
+                "Wang", "137-0000-0003", "wang_alaska",
+                "Two years old, strong and energetic. Needs an adopter with large space and experience caring for active medium-to-large dogs.",
+                "/snake-pet.svg"
         );
         seedPost(
-                ensurePublisher("13810000004", "陈女士", "https://api.dicebear.com/7.x/avataaars/svg?seed=chen"),
-                "母", "布偶猫", "深圳", "南山区",
-                "陈女士", "136-0000-0004", null,
-                "温柔粘人，纯种布偶，已驱虫，送猫砂盆。布偶猫是理想的室内宠物，性格温顺，喜欢被人抱在怀里。",
-                "https://images.unsplash.com/photo-1513245543132-31f507417b26?w=400&h=400&fit=crop"
+                ensurePublisher("13810000004", "Chen", "https://api.dicebear.com/7.x/avataaars/svg?seed=chen"),
+                "Female", "Ragdoll Cat", "Shenzhen", "Nanshan District",
+                "Chen", "136-0000-0004", null,
+                "Indoor cat with a calm temperament. Adoption includes litter box and basic supplies, best for a stable and quiet home.",
+                "/duck-pet.svg"
         );
         seedPost(
-                ensurePublisher("13810000005", "刘先生", "https://api.dicebear.com/7.x/avataaars/svg?seed=liu"),
-                "不详", "柯基", "杭州", "西湖区",
-                "刘先生", "135-0000-0005", "liu_corgi",
-                "短腿萌犬，精力旺盛，已完成疫苗接种。柯基犬虽然腿短，但非常活泼可爱，是网红犬种。",
-                "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop"
+                ensurePublisher("13810000005", "Liu", "https://api.dicebear.com/7.x/avataaars/svg?seed=liu"),
+                "Unknown", "Corgi", "Hangzhou", "Xihu District",
+                "Liu", "135-0000-0005", "liu_corgi",
+                "Short-legged and lively, completed basic vaccination. Suitable for a home that can provide regular walks and play time.",
+                "/default-pet.svg"
         );
         seedPost(
-                ensurePublisher("13810000006", "赵女士", "https://api.dicebear.com/7.x/avataaars/svg?seed=zhao"),
-                "母", "萨摩耶", "成都", "锦江区",
-                "赵女士", "134-0000-0006", null,
-                "微笑天使，三岁，性格乖巧，寻找有经验主人。萨摩耶犬有着美丽的白色毛发，需要定期梳理。",
-                "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=400&h=400&fit=crop"
+                ensurePublisher("13810000006", "Zhao", "https://api.dicebear.com/7.x/avataaars/svg?seed=zhao"),
+                "Female", "Samoyed", "Chengdu", "Jinjiang District",
+                "Zhao", "134-0000-0006", null,
+                "Three years old with a very stable personality. Needs an adopter who can brush and care for a long white coat regularly.",
+                "/default-pet.svg"
         );
+    }
+
+    private void cleanupRemovedDemoPosts() {
+        List<Long> postIds = adoptionPostMapper.selectIdsByContactPhones(REMOVED_DEMO_CONTACT_PHONES);
+        if (!postIds.isEmpty()) {
+            imageMapper.deleteByAdoptionPostIds(postIds);
+            adoptionPostMapper.deleteByContactPhones(REMOVED_DEMO_CONTACT_PHONES);
+        }
     }
 
     private Long ensurePublisher(String phone, String username, String avatar) {

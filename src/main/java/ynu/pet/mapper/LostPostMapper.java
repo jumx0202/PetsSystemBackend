@@ -12,6 +12,8 @@ import java.util.List;
 public interface LostPostMapper {
     int countByContactPhone(@Param("contactPhone") String contactPhone);
     int updatePublisherByContactPhone(@Param("contactPhone") String contactPhone, @Param("publisherId") Long publisherId);
+    List<Long> selectIdsByContactPhones(@Param("contactPhones") List<String> contactPhones);
+    int deleteByContactPhones(@Param("contactPhones") List<String> contactPhones);
 
     int insert(LostPost post);
 

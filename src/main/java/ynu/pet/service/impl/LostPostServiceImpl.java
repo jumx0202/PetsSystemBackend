@@ -48,7 +48,7 @@ public class LostPostServiceImpl implements LostPostService {
                     continue;
                 }
                 String safeUrl = rawUrl.startsWith("data:")
-                        ? "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&h=400&fit=crop"
+                        ? "/default-pet.svg"
                         : rawUrl;
                 Image image = new Image();
                 image.setImageUrl(safeUrl);

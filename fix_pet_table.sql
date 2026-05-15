@@ -38,3 +38,5 @@ ALTER TABLE Image DROP behavior_log_id;
 
 DROP TABLE behavior_daily_stats;
 DROP TABLE notifications;
+
+ALTER TABLE Pet ADD COLUMN chip_number VARCHAR(50);

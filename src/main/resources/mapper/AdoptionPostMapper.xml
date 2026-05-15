@@ -17,6 +17,21 @@
         SET postadoption_publisher_id = #{publisherId}
         WHERE contact_phone = #{contactPhone}
     </update>
+    <select id="selectIdsByContactPhones" resultType="long">
+        SELECT postadoption_id
+        FROM PostAdoption
+        WHERE contact_phone IN
+        <foreach collection="contactPhones" item="phone" open="(" separator="," close=")">
+            #{phone}
+        </foreach>
+    </select>
+    <delete id="deleteByContactPhones">
+        DELETE FROM PostAdoption
+        WHERE contact_phone IN
+        <foreach collection="contactPhones" item="phone" open="(" separator="," close=")">
+            #{phone}
+        </foreach>
+    </delete>
 
     <resultMap id="PublisherResultMap" type="ynu.pet.entity.User">
         <id property="id" column="u_id"/>

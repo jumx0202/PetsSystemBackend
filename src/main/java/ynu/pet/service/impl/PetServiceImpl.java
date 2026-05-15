@@ -80,11 +80,7 @@ public class PetServiceImpl implements PetService {
 
     @Override
     public Result<PetDTO> getPetByChipNumber(String chipNumber) {
-        Pet pet = petMapper.selectByChipNumber(chipNumber);
-        if (pet == null) {
-            return Result.error("未找到该芯片编号的宠物");
-        }
-        return Result.success(convertToDTO(pet));
+        return Result.error("当前数据库未启用芯片编号字段，暂不支持按芯片编号查询");
     }
 
     @Override

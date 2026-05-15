@@ -15,7 +15,6 @@
         <result property="weight" column="weight"/>
         <result property="color" column="color"/>
         <result property="distinctiveFeatures" column="distinctive_features"/>
-        <result property="chipNumber" column="chip_number"/>
         <result property="avatar" column="avatar"/>
         <association property="owner" javaType="ynu.pet.entity.User">
             <id property="id" column="owner_id"/>
@@ -24,8 +23,8 @@
     </resultMap>
 
     <insert id="insert" parameterType="ynu.pet.entity.Pet" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO Pet(owner_id, pet_name, pet_type, breed, gender, birth_date, weight, color, distinctive_features, chip_number, avatar)
-        VALUES(#{owner.id}, #{petName}, #{petType, typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}, #{breed}, #{gender}, #{birthDate}, #{weight}, #{color}, #{distinctiveFeatures}, #{chipNumber}, #{avatar})
+        INSERT INTO Pet(owner_id, pet_name, pet_type, breed, gender, birth_date, weight, color, distinctive_features, avatar)
+        VALUES(#{owner.id}, #{petName}, #{petType, typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}, #{breed}, #{gender}, #{birthDate}, #{weight}, #{color}, #{distinctiveFeatures}, #{avatar})
     </insert>
 
     <select id="selectById" parameterType="long" resultMap="PetResultMap">
@@ -46,7 +45,7 @@
         SELECT p.*, u.username AS owner_name
         FROM Pet p
         LEFT JOIN User u ON p.owner_id = u.user_id
-        WHERE p.chip_number = #{chipNumber}
+        WHERE 1 = 0
     </select>
 
     <select id="selectAll" resultMap="PetResultMap">
@@ -67,7 +66,6 @@
             weight = #{weight},
             color = #{color},
             distinctive_features = #{distinctiveFeatures},
-            chip_number = #{chipNumber},
             avatar = #{avatar}
         WHERE id = #{id}
     </update>

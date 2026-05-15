@@ -140,7 +140,7 @@ public class AdoptionPostServiceImpl implements AdoptionPostService {
             }
             // 兜底：避免前端直接传 base64 导致字段超长
             String safeUrl = rawUrl.startsWith("data:")
-                    ? "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&h=400&fit=crop"
+                    ? "/default-pet.svg"
                     : rawUrl;
             Image image = new Image();
             image.setImageUrl(safeUrl);

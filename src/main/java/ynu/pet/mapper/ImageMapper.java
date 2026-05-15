@@ -33,6 +33,8 @@ public interface ImageMapper {
 
     // 删除图片
     int deleteById(Long id);
+    int deleteByAdoptionPostIds(@Param("postIds") List<Long> postIds);
+    int deleteByLostPostIds(@Param("postIds") List<Long> postIds);
 
     // 批量删除
     int batchDelete(@Param("ids") List<Long> ids);
