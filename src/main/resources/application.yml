@@ -25,3 +25,6 @@ upload:
 
 ai:
   api-key: sk-2231130223824be082cef7dfdc227cf9
+  recognize-url: http://localhost:8000/api/recognize
+  connect-timeout-ms: 5000
+  read-timeout-ms: 60000
