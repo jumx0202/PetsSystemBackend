@@ -1,2 +1,9 @@
 /target/
 /.idea/
+uploads/
+backups/
+*.class
+*.iml
+.DS_Store
+Test*.java
+test_backend_sse.sh
