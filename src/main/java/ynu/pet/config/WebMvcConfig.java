@@ -37,8 +37,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/user/login",
                         "/api/adoption/list",
                         "/api/lost/list",
+                        "/api/pet/all",
                         "/api/upload/**",
                         "/api/ai/recognize",
+                        "/api/ai/petface/verify",
+                        "/api/ai/petface/search",
+                        "/api/lost/*/petface/matches",
                         "/upload/**",
                         "/images/**"          // 让图片资源不经过 JWT 拦截
                 );

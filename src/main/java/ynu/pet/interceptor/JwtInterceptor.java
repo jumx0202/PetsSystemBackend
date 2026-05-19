@@ -27,12 +27,13 @@ public class JwtInterceptor implements HandlerInterceptor {
         if (uri.equals("/api/test/ping")) {
             return true;  // 不校验 Token
         }
-        // 帖子详情允许游客访问
+        // 帖子详情与宠物档案详情允许游客访问
         if (HttpMethod.GET.matches(request.getMethod())
                 && (uri.matches("^/api/adoption/\\d+$")
                 || uri.matches("^/api/lost/\\d+$")
                 || uri.equals("/api/forum/posts")
-                || uri.matches("^/api/forum/posts/\\d+$"))) {
+                || uri.matches("^/api/forum/posts/\\d+$")
+                || uri.matches("^/api/pet/\\d+$"))) {
             return true;
         }
 

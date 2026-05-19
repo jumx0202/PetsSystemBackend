@@ -66,6 +66,10 @@
         WHERE id = #{id}
     </delete>
 
+    <delete id="deleteByPetId" parameterType="long">
+        DELETE FROM Image WHERE pet_id = #{petId}
+    </delete>
+
     <delete id="deleteByAdoptionPostIds">
         DELETE FROM Image
         WHERE postadoption_id IN

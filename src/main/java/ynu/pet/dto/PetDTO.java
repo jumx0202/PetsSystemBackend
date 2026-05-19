@@ -23,4 +23,7 @@ public class PetDTO {
     private String chipNumber;
     private String avatar;
     private List<String> images;
+    private Boolean faceFeatureReady;
+    private String ownerName;
+    private String ownerPhone;
 }

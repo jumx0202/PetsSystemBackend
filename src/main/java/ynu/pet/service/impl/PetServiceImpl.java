@@ -7,6 +7,7 @@ import ynu.pet.entity.Pet;
 import ynu.pet.entity.User;
 import ynu.pet.exception.BussinessException;
 import ynu.pet.mapper.ImageMapper;
+import ynu.pet.mapper.PetFaceEmbeddingMapper;
 import ynu.pet.mapper.PetMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,12 @@ public class PetServiceImpl implements PetService {
 
     @Autowired
     private ImageMapper imageMapper;
+
+    @Autowired
+    private PetFaceEmbeddingMapper petFaceEmbeddingMapper;
+
+    @Autowired
+    private ynu.pet.service.PetFaceService petFaceService;
 
     @Override
     @Transactional
@@ -53,6 +60,8 @@ public class PetServiceImpl implements PetService {
                 imageMapper.insert(image);
             }
         }
+
+        rebuildFaceFeatureQuietly(pet);
 
         return Result.success();
     }
@@ -90,7 +99,35 @@ public class PetServiceImpl implements PetService {
         BeanUtils.copyProperties(dto, pet);
         pet.setPetType(convertPetType(dto.getPetType()));
         petMapper.update(pet);
+
+        // 更新图片：先删除旧图片，再插入新图片
+        imageMapper.deleteByPetId(pet.getId());
+        if (dto.getImages() != null && !dto.getImages().isEmpty()) {
+            for (int i = 0; i < dto.getImages().size(); i++) {
+                Image image = new Image();
+                image.setImageUrl(dto.getImages().get(i));
+                image.setSortOrder(i);
+                Pet petRef = new Pet();
+                petRef.setId(pet.getId());
+                image.setPet(petRef);
+                image.setImageType(Image.ImageType.PET);
+                imageMapper.insert(image);
+            }
+        }
+
+        rebuildFaceFeatureQuietly(pet);
         return Result.success();
+    }
+
+    @Override
+    public Result<List<PetDTO>> getAllPets(int page, int size) {
+        int offset = (page - 1) * size;
+        List<Pet> pets = petMapper.selectAll(offset, size);
+        List<PetDTO> dtoList = new ArrayList<>();
+        for (Pet pet : pets) {
+            dtoList.add(convertToDTO(pet));
+        }
+        return Result.success(dtoList);
     }
 
     @Override
@@ -137,7 +174,25 @@ public class PetServiceImpl implements PetService {
             imageUrls.add(img.getImageUrl());
         }
         dto.setImages(imageUrls);
+        dto.setFaceFeatureReady(petFaceEmbeddingMapper.selectByPetId(pet.getId()) != null);
+
+        // 设置主人信息
+        if (pet.getOwner() != null) {
+            dto.setOwnerName(pet.getOwner().getUsername());
+            dto.setOwnerPhone(pet.getOwner().getPhone());
+        }
 
         return dto;
+    }
+
+    private void rebuildFaceFeatureQuietly(Pet pet) {
+        if (pet == null || pet.getId() == null || pet.getAvatar() == null || pet.getAvatar().isBlank()) {
+            return;
+        }
+        try {
+            petFaceService.rebuildPetFace(pet.getId());
+        } catch (Exception ignored) {
+            // 建档/编辑宠物不能因为 AI 服务暂时不可用而失败。
+        }
     }
 }

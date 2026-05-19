@@ -12,4 +12,5 @@ public interface PetService {
     Result<PetDTO> getPetByChipNumber(String chipNumber);
     Result<Void> updatePet(PetDTO dto);
     Result<Void> deletePet(Long id, Long ownerId);
+    Result<List<PetDTO>> getAllPets(int page, int size);
 }

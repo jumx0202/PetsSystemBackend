@@ -70,4 +70,12 @@ public class PetController {
             @Parameter(hidden = true) @RequestAttribute Long userId) {
         return petService.deletePet(id, userId);
     }
+
+    @Operation(summary = "宠物大全（所有宠物分页列表，游客可访问）")
+    @GetMapping("/all")
+    public Result<List<PetDTO>> getAllPets(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "50") int size) {
+        return petService.getAllPets(page, size);
+    }
 }

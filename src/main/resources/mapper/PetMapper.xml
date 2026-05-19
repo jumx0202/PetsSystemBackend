@@ -19,6 +19,7 @@
         <association property="owner" javaType="ynu.pet.entity.User">
             <id property="id" column="owner_id"/>
             <result property="username" column="owner_name"/>
+            <result property="phone" column="owner_phone"/>
         </association>
     </resultMap>
 
@@ -28,28 +29,28 @@
     </insert>
 
     <select id="selectById" parameterType="long" resultMap="PetResultMap">
-        SELECT p.*, u.username AS owner_name
+        SELECT p.*, u.username AS owner_name, u.phone AS owner_phone
         FROM Pet p
         LEFT JOIN User u ON p.owner_id = u.user_id
         WHERE p.id = #{id}
     </select>
 
     <select id="selectByOwnerId" parameterType="long" resultMap="PetResultMap">
-        SELECT p.*, u.username AS owner_name
+        SELECT p.*, u.username AS owner_name, u.phone AS owner_phone
         FROM Pet p
         LEFT JOIN User u ON p.owner_id = u.user_id
         WHERE p.owner_id = #{ownerId}
     </select>
 
     <select id="selectByChipNumber" parameterType="string" resultMap="PetResultMap">
-        SELECT p.*, u.username AS owner_name
+        SELECT p.*, u.username AS owner_name, u.phone AS owner_phone
         FROM Pet p
         LEFT JOIN User u ON p.owner_id = u.user_id
         WHERE 1 = 0
     </select>
 
     <select id="selectAll" resultMap="PetResultMap">
-        SELECT p.*, u.username AS owner_name
+        SELECT p.*, u.username AS owner_name, u.phone AS owner_phone
         FROM Pet p
         LEFT JOIN User u ON p.owner_id = u.user_id
         ORDER BY p.id DESC
