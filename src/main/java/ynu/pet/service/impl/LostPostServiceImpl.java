@@ -29,7 +29,7 @@ public class LostPostServiceImpl implements LostPostService {
 
     @Override
     @Transactional
-    public Result<Void> createPost(LostPostDTO dto, Long publisherId) {
+    public Result<Long> createPost(LostPostDTO dto, Long publisherId) {
         LostPost post = new LostPost();
         BeanUtils.copyProperties(dto, post);
 
@@ -59,7 +59,7 @@ public class LostPostServiceImpl implements LostPostService {
             }
         }
 
-        return Result.success();
+        return Result.success(post.getId());
     }
 
     @Override

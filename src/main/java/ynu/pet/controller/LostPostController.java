@@ -26,7 +26,7 @@ public class LostPostController {
     @Operation(summary = "发布寻宠启事", description = "发布宠物丢失信息")
     @SecurityRequirement(name = "BearerAuth")
     @PostMapping("/publish")
-    public Result<Void> createPost(
+    public Result<Long> createPost(
             @RequestBody LostPostDTO dto,
             @Parameter(hidden = true) @RequestAttribute("userId") Long userId) {
         return postService.createPost(dto, userId);

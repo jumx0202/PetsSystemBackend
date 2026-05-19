@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ynu.pet.mapper.PetFaceEmbeddingMapper">
+
+    <resultMap id="PetFaceEmbeddingResultMap" type="ynu.pet.entity.PetFaceEmbedding">
+        <id property="id" column="id"/>
+        <result property="petId" column="pet_id"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="imageUrls" column="image_urls"/>
+        <result property="imageCount" column="image_count"/>
+        <result property="modelVersion" column="model_version"/>
+        <result property="embeddingDim" column="embedding_dim"/>
+        <result property="embeddingJson" column="embedding_json"/>
+        <result property="embeddingItemsJson" column="embedding_items_json"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <insert id="upsert" parameterType="ynu.pet.entity.PetFaceEmbedding">
+        INSERT INTO pet_face_embedding(pet_id, image_url, image_urls, image_count, model_version, embedding_dim, embedding_json, embedding_items_json)
+        VALUES(#{petId}, #{imageUrl}, #{imageUrls}, #{imageCount}, #{modelVersion}, #{embeddingDim}, #{embeddingJson}, #{embeddingItemsJson})
+        ON DUPLICATE KEY UPDATE
+            image_url = VALUES(image_url),
+            image_urls = VALUES(image_urls),
+            image_count = VALUES(image_count),
+            model_version = VALUES(model_version),
+            embedding_dim = VALUES(embedding_dim),
+            embedding_json = VALUES(embedding_json),
+            embedding_items_json = VALUES(embedding_items_json),
+            updated_at = CURRENT_TIMESTAMP
+    </insert>
+
+    <select id="selectByPetId" parameterType="long" resultMap="PetFaceEmbeddingResultMap">
+        SELECT *
+        FROM pet_face_embedding
+        WHERE pet_id = #{petId}
+        LIMIT 1
+    </select>
+
+    <select id="selectAll" resultMap="PetFaceEmbeddingResultMap">
+        SELECT *
+        FROM pet_face_embedding
+        ORDER BY updated_at DESC
+    </select>
+
+    <delete id="deleteByPetId" parameterType="long">
+        DELETE FROM pet_face_embedding
+        WHERE pet_id = #{petId}
+    </delete>
+</mapper>

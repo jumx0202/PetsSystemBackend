@@ -6,7 +6,7 @@ import ynu.pet.dto.Result;
 import java.util.List;
 
 public interface LostPostService {
-    Result<Void> createPost(LostPostDTO dto, Long publisherId);
+    Result<Long> createPost(LostPostDTO dto, Long publisherId);
     Result<LostPostDTO> getPostById(Long id);
     Result<PageResult<LostPostDTO>> listPosts(String city, String gender, String breed,
                                               Integer pageNum, Integer pageSize);
