@@ -24,10 +24,10 @@ public class AiChatServiceImpl implements AiChatService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Value("${ai.base-url:https://api.deepseek.com/v1}")
+    @Value("${ai.chat-base-url:${ai.base-url:https://api.deepseek.com/v1}}")
     private String baseUrl;
 
-    @Value("${ai.path:/chat/completions}")
+    @Value("${ai.chat-path:${ai.path:/chat/completions}}")
     private String path;
 
     @Value("${ai.api-key:}")
@@ -213,6 +213,7 @@ public class AiChatServiceImpl implements AiChatService {
                         })
                         .exceptionally(ex -> {
                             try {
+                                log.error("AI 流式对话网络请求异常", ex);
                                 emitter.send(org.springframework.web.servlet.mvc.method.annotation.SseEmitter.event().name("error").data("网络请求异常"));
                                 emitter.completeWithError(ex);
                             } catch (Exception e) {}
