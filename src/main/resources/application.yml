@@ -24,7 +24,7 @@ upload:
   url-prefix: http://localhost:8080/upload
 
 ai:
-  api-key: sk-2231130223824be082cef7dfdc227cf9
+  api-key:
   chat-base-url: https://api.deepseek.com/v1
   chat-path: /chat/completions
   model: deepseek-chat
